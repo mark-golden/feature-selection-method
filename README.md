@@ -25,7 +25,6 @@ import pandas as pd
 # 读取数据
 data = pd.read_excel("数据文件.xlsx")
 
-
 # mRMR 特征选择方法
 feature_length = 10
 selected_data = FS.mRMR_feature_selection(data,feature_length)
