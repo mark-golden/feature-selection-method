@@ -5,6 +5,11 @@ import pandas as pd
 import numpy as np
 from sklearn import metrics
 
+"""
+	类: feature_1_select
+	功能: 选择第一个特征
+	输入: dataset-数据集
+"""
 class feature_1_select():
 	def __init__(self,dataset):
 
@@ -58,7 +63,9 @@ class feature_1_select():
 		
 		return [NMI_dict_revise,feature_1]
 
-
+"""
+	类: 选择第2个及之后的特征
+"""
 class feature_i_select():
 	def __init__(self,NMI_dict_revise,selected_feature):
 
@@ -117,7 +124,9 @@ class feature_i_select():
 		
 		return [NMI_dict_revise_2,feature_2]
 
-
+"""
+	类: 返回序列序号
+"""
 class output_data:
 	def __init__(self):
 		self.feature_series = []
@@ -142,7 +151,12 @@ class output_data:
 		
 		return self.final_data
 
-
+"""
+	函数: data_normalization
+	功能: 数据归一化
+	输入: data-数据集
+	输出: data_normal-归一化后的数据集
+"""	
 def data_normalization(data):
 
 	# 提取Y数据
@@ -193,7 +207,11 @@ def data_normalization_0_1(data):
 
 
 """
-	函数: mRMR特征选择方法
+	函数: mRMR_feature_selection
+	功能: mRMR特征选择主函数
+	输入: data-数据集
+		  feature_length-要选择的特征数
+	输出: selected_data-选择后的数据集
 """
 def mRMR_feature_selection(data,feature_length):
 
