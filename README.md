@@ -25,5 +25,27 @@ import Feature_Selection as FS
 feature_length = 10
 selected_data = FS.mRMR_feature_selection(data,feature_length)
 
+# Removing features with low variance
+variance_threshold = 0.9
+selected_data = FS.removing_features_with_low_variance(data,variance_threshold)
+
+# Univariate feature selection
+feature_length = 10
+selected_data = FS.univariate_feature_selection(data,feature_length) 
+
+# Locally linear embedding
+feature_length = 10
+selected_data = FS.lle_feature_reduction(data,feature_length)
+
+# PCA
+feature_length = 10
+selected_data = FS.PCA_feature_selection(data,feature_length)
+
+# Factor Analysis
+feature_length = 10
+selected_data = FS.fa_feature_selection(data,feature_length)
+
+# ICA
+selected_data = FS.ICA_feature_selection(data,feature_length)
 ```
 
