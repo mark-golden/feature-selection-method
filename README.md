@@ -16,3 +16,14 @@
 - 第一列为: Y数据
 - 第二列为: X数据
 
+# 代码
+```python 
+# 导入特征选择库
+import Feature_Selection as FS
+
+# mRMR 特征选择方法
+feature_length = 10
+selected_data = FS.mRMR_feature_selection(data,feature_length)
+
+```
+
