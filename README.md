@@ -20,6 +20,11 @@
 ```python 
 # 导入特征选择库
 import Feature_Selection as FS
+import pandas as pd 
+
+# 读取数据
+data = pd.read_excel("数据文件.xlsx")
+
 
 # mRMR 特征选择方法
 feature_length = 10
