@@ -23,7 +23,7 @@
 # Prerequisties
 - pandas, numpy, scikit-learn
 
-# 代码
+# 示例代码
 ```python 
 # 导入特征选择库
 import Feature_Selection as FS
