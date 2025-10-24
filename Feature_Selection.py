@@ -217,7 +217,7 @@ def mRMR_feature_selection(data,feature_length):
 	# 数据归一化
 	data_normal = data_normalization(data)
 
-	# 空缺值
+	# 空缺值处理
 	data_normal = data_normal.fillna(0)
 
 	# 选择特征
