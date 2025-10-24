@@ -3,11 +3,20 @@
 import pandas as pd
 import numpy as np
 from sklearn import metrics
+# 导入mutual_info_regression库
+from sklearn.feature_selection import mutual_info_regression
+
+import warnings
+warnings.filterwarnings("ignore")
 
 """
 	类: feature_1_select
 	功能: 选择第一个特征
 	输入: dataset-数据集
+	变量含义: 
+		self.NMI_dict: { '1': ['1', X1向量, MI1], '2': ['2', X2向量, MI2], … }
+		self.NMI_dict_revise: 对 self.NMI_dict 排序并去掉第1个特征后的新字典
+		feature_1: 选择的第1个特征 ['1', X1向量, MI1]
 """
 class feature_1_select():
 	def __init__(self,dataset):
@@ -17,7 +26,7 @@ class feature_1_select():
 
 		# Y数据
 		output_data = dataset.iloc[:,0:1]
-		output_label = np.array(output_data).ravel()
+		output_label = np.array(output_data).ravel() # 转换为一维数组
 
 		# 互信息字典
 		self.NMI_dict = {}
@@ -27,10 +36,15 @@ class feature_1_select():
 			feature_name = str(i)
 			### 提取X数据
 			input_data = dataset.iloc[:,i:i+1]
-			input_label = np.array(input_data).ravel()
-			## 计算互信息
-			result_NMI = metrics.normalized_mutual_info_score(input_label, output_label)
-			
+			input_label = np.array(input_data).ravel() # 转换为一维数组
+			## 计算互信息 
+			### 适合于X与Y均为离散型变量
+			# result_NMI = metrics.normalized_mutual_info_score(input_label, output_label)
+			### 适合于X为连续型变量，Y为离散型变量
+			# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_label, bins=10), output_label)
+			### 适合于X与Y均为连续型变量
+			result_NMI = mutual_info_regression(input_data, output_label)[0]
+
 			self.NMI_dict[feature_name] = [str(i),input_label,result_NMI]
 
 	def bubblesort(self):
@@ -64,6 +78,10 @@ class feature_1_select():
 
 """
 	类: 选择第2个及之后的特征
+	变量含义:
+		 feature_2: 当前轮次选出的特征（mRMR值最高）: ['3', X3_array, MI(X3, Y)]
+		 NMI_dict_revise_2: 剩余未被选择的特征（下一轮的候选池）: {'4': ['4', X4_array, MI(X4, Y)], '5': ['5', X5_array, MI(X5, Y)]}
+
 """
 class feature_i_select():
 	def __init__(self,NMI_dict_revise,selected_feature):
@@ -83,7 +101,15 @@ class feature_i_select():
 			min_red = 0
 			for feature_n in  selected_feature:
 				feature_1_data = feature_n[1]
-				result_NMI = metrics.normalized_mutual_info_score(input_data, feature_1_data)
+				
+				### 适合于X与Y均为离散型变量
+				# result_NMI = metrics.normalized_mutual_info_score(input_data, feature_1_data)
+				### 适合于X为连续型变量，Y为离散型变量
+				# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_label, bins=10), output_label)
+				### 适合于X与Y均为连续型变量
+				
+				result_NMI = mutual_info_regression(input_data.reshape(-1, 1), feature_1_data.ravel())[0]
+
 				min_red += result_NMI
 
 			## 平均冗余值
@@ -229,7 +255,7 @@ def mRMR_feature_selection(data,feature_length):
 	selected_feature.append(feature_1)
 
 	## 选出第二及之后的特征
-	feature_new_length = feature_length-1
+	feature_new_length = feature_length-1 # 还需要再选择特征的长度
 	for i in range(feature_new_length):
 		[NMI_dict_revise,feature] = feature_i_select(NMI_dict_revise,selected_feature).bubblesort_2()
 		selected_feature.append(feature)
