@@ -20,7 +20,8 @@
 ## 输出
 - data数据: 包含Y和X的数据集
 
-
+# Prerequisties
+- pandas, numpy, scikit-learn
 
 # 代码
 ```python 
