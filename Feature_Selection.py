@@ -142,7 +142,11 @@ class feature_i_select():
 				elif X_type == 'continuous' and Y_type == 'continuous':
 					result_NMI = mutual_info_regression(input_data.reshape(-1, 1), feature_1_data.ravel())[0]
 
-				min_red += result_NMI
+				try:
+					min_red += result_NMI
+				except:
+					result_NMI = 0
+					min_red += result_NMI
 
 			## 平均冗余值
 			mean_min_red = min_red / selected_feature_length
