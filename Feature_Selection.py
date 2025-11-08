@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 		feature_1: 选择的第1个特征 ['1', X1向量, MI1]
 """
 class feature_1_select():
-	def __init__(self,dataset,X_type,Y_type):
+	def __init__(self,dataset):
 
 		# 数据列数
 		col_number = dataset.shape[1]
@@ -27,6 +27,12 @@ class feature_1_select():
 		# Y数据
 		output_data = dataset.iloc[:,0:1]
 		output_label = np.array(output_data).ravel() # 转换为一维数组
+		# 检测output_label的数值范围是离散值还是连续值
+		unique_values_y = np.unique(output_label)
+		if len(unique_values_y) <= 15:
+			Y_type = 'discrete'
+		else:
+			Y_type = 'continuous'
 
 		# 互信息字典
 		self.NMI_dict = {}
@@ -37,6 +43,13 @@ class feature_1_select():
 			### 提取X数据
 			input_data = dataset.iloc[:,i:i+1]
 			input_label = np.array(input_data).ravel() # 转换为一维数组
+			### 检测input_label的数值范围是离散值还是连续值
+			unique_values_x = np.unique(input_label)
+			if len(unique_values_x) <= 15:
+				X_type = 'discrete'
+			else:
+				X_type = 'continuous'
+
 			## 计算互信息 
 			### 适合于X与Y均为离散型变量
 			if X_type == 'discrete' and Y_type == 'discrete':
@@ -88,7 +101,7 @@ class feature_1_select():
 
 """
 class feature_i_select():
-	def __init__(self,NMI_dict_revise,selected_feature,X_type,Y_type):
+	def __init__(self,NMI_dict_revise,selected_feature):
 
 		# 尚未选择的特征
 		self.NMI_dict_revise = NMI_dict_revise
@@ -100,11 +113,23 @@ class feature_i_select():
 
 			## 输入数据
 			input_data = self.NMI_dict_revise[keys_value][1]
+			### 检测input_data的数值范围是离散值还是连续值
+			unique_values_x = np.unique(input_data)
+			if len(unique_values_x) <= 15:
+				X_type = 'discrete'
+			else:
+				X_type = 'continuous'
 			
 			## 最小冗余
 			min_red = 0
 			for feature_n in  selected_feature:
 				feature_1_data = feature_n[1]
+				### 检测feature_1_data的数值范围是离散值还是连续值
+				unique_values_y = np.unique(feature_1_data)
+				if len(unique_values_y) <= 15:
+					Y_type = 'discrete'
+				else:
+					Y_type = 'continuous'
 				
 				### 适合于X与Y均为离散型变量
 				if X_type == 'discrete' and Y_type == 'discrete':
@@ -245,7 +270,7 @@ def data_normalization_0_1(data):
 		  feature_length-要选择的特征数
 	输出: selected_data-选择后的数据集
 """
-def mRMR_feature_selection(data,feature_length,X_type,Y_type):
+def mRMR_feature_selection(data,feature_length):
 
 	# 数据归一化
 	data_normal = data_normalization(data)
@@ -258,13 +283,13 @@ def mRMR_feature_selection(data,feature_length,X_type,Y_type):
 	selected_feature = []
 
 	## 选出第一个特征
-	[NMI_dict_revise,feature_1] = feature_1_select(data_normal,X_type,Y_type).bubblesort()
+	[NMI_dict_revise,feature_1] = feature_1_select(data_normal).bubblesort()
 	selected_feature.append(feature_1)
 
 	## 选出第二及之后的特征
 	feature_new_length = feature_length-1 # 还需要再选择特征的长度
 	for i in range(feature_new_length):
-		[NMI_dict_revise,feature] = feature_i_select(NMI_dict_revise,selected_feature,X_type,Y_type).bubblesort_2()
+		[NMI_dict_revise,feature] = feature_i_select(NMI_dict_revise,selected_feature).bubblesort_2()
 		selected_feature.append(feature)
 
 	## 返回序列序号
