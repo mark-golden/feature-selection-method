@@ -16,9 +16,12 @@ def main():
 
 	# 输入要提取的特征数
 	feature_length = 5
+	# X与Y的类型: continuous/discrete
+	X_type = 'continuous'
+	Y_type = 'discrete'
 	
 	# 特征选择
-	selected_data = FS.mRMR_feature_selection(data,feature_length)
+	selected_data = FS.mRMR_feature_selection(data,feature_length,X_type,Y_type)
 
 	print(selected_data)
 	

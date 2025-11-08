@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 		feature_1: 选择的第1个特征 ['1', X1向量, MI1]
 """
 class feature_1_select():
-	def __init__(self,dataset):
+	def __init__(self,dataset,X_type,Y_type):
 
 		# 数据列数
 		col_number = dataset.shape[1]
@@ -39,11 +39,15 @@ class feature_1_select():
 			input_label = np.array(input_data).ravel() # 转换为一维数组
 			## 计算互信息 
 			### 适合于X与Y均为离散型变量
-			# result_NMI = metrics.normalized_mutual_info_score(input_label, output_label)
+			if X_type == 'discrete' and Y_type == 'discrete':
+				result_NMI = metrics.normalized_mutual_info_score(input_label, output_label)
 			### 适合于X为连续型变量，Y为离散型变量
-			# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_label, bins=10), output_label)
+			elif X_type == 'continuous' and Y_type == 'discrete':
+				# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_label, bins=10), output_label)
+				result_NMI = metrics.normalized_mutual_info_score(input_label, output_label)
 			### 适合于X与Y均为连续型变量
-			result_NMI = mutual_info_regression(input_data, output_label)[0]
+			elif X_type == 'continuous' and Y_type == 'continuous':
+				result_NMI = mutual_info_regression(input_data, output_label)[0]
 
 			self.NMI_dict[feature_name] = [str(i),input_label,result_NMI]
 
@@ -84,7 +88,7 @@ class feature_1_select():
 
 """
 class feature_i_select():
-	def __init__(self,NMI_dict_revise,selected_feature):
+	def __init__(self,NMI_dict_revise,selected_feature,X_type,Y_type):
 
 		# 尚未选择的特征
 		self.NMI_dict_revise = NMI_dict_revise
@@ -103,12 +107,15 @@ class feature_i_select():
 				feature_1_data = feature_n[1]
 				
 				### 适合于X与Y均为离散型变量
-				# result_NMI = metrics.normalized_mutual_info_score(input_data, feature_1_data)
+				if X_type == 'discrete' and Y_type == 'discrete':
+					result_NMI = metrics.normalized_mutual_info_score(input_data, feature_1_data)
 				### 适合于X为连续型变量，Y为离散型变量
-				# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_label, bins=10), output_label)
+				elif X_type == 'continuous' and Y_type == 'discrete':
+					# result_NMI = metrics.normalized_mutual_info_score(np.digitize(input_data, bins=10), feature_1_data)
+					result_NMI = metrics.normalized_mutual_info_score(input_data, feature_1_data)
 				### 适合于X与Y均为连续型变量
-				
-				result_NMI = mutual_info_regression(input_data.reshape(-1, 1), feature_1_data.ravel())[0]
+				elif X_type == 'continuous' and Y_type == 'continuous':
+					result_NMI = mutual_info_regression(input_data.reshape(-1, 1), feature_1_data.ravel())[0]
 
 				min_red += result_NMI
 
@@ -238,7 +245,7 @@ def data_normalization_0_1(data):
 		  feature_length-要选择的特征数
 	输出: selected_data-选择后的数据集
 """
-def mRMR_feature_selection(data,feature_length):
+def mRMR_feature_selection(data,feature_length,X_type,Y_type):
 
 	# 数据归一化
 	data_normal = data_normalization(data)
@@ -251,13 +258,13 @@ def mRMR_feature_selection(data,feature_length):
 	selected_feature = []
 
 	## 选出第一个特征
-	[NMI_dict_revise,feature_1] = feature_1_select(data_normal).bubblesort()
+	[NMI_dict_revise,feature_1] = feature_1_select(data_normal,X_type,Y_type).bubblesort()
 	selected_feature.append(feature_1)
 
 	## 选出第二及之后的特征
 	feature_new_length = feature_length-1 # 还需要再选择特征的长度
 	for i in range(feature_new_length):
-		[NMI_dict_revise,feature] = feature_i_select(NMI_dict_revise,selected_feature).bubblesort_2()
+		[NMI_dict_revise,feature] = feature_i_select(NMI_dict_revise,selected_feature,X_type,Y_type).bubblesort_2()
 		selected_feature.append(feature)
 
 	## 返回序列序号
